@@ -2,5 +2,7 @@ package commands;
 
 public interface ICommand {
 	
-	public boolean validarComando(String acao, int numVezes);
+	public boolean validate();
+	
+	public void execute();
 }

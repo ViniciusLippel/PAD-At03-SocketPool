@@ -45,4 +45,12 @@ public class Client {
 		
 		entrada.close();
 	}
+	
+	public void ClientWait() throws InterruptedException {
+		Thread.currentThread().wait();
+	}
+	
+	public void ClientNotifyAll() {
+		Thread.currentThread().notifyAll();
+	}
 }

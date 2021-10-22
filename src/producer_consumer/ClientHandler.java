@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Random;
+import commands.*;
 
 public class ClientHandler extends Thread{
 	
 	private Socket socket;
+	private final static Object lock = new Object();
 	
 	public ClientHandler(Socket socket) {
 		this.socket = socket;
@@ -27,31 +29,70 @@ public class ClientHandler extends Thread{
 		}
 		
 		do {
-			String texto = null;
-			
+			String text = null;
+			System.out.println("do/while loop");
 			try {
-				texto = entrada.readLine();
+				text = entrada.readLine();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			System.out.println(texto);
+			System.out.println(text);
 			
-			if(texto == null) {
+			if(text == null) {
 				break;
 			}
 			
-			String[] msg = texto.split(" ");
+			String[] msg = text.split(" ");
 			
-			if(msg[0].equals("fib")) {
-				new Thread(new FibThread(rand.nextInt(20))).start();
+			ICommand command = null;
+			
+			switch(msg[0]) {
+			case "new":
+				command = new CommandNew(msg);
+				execute(command);
+				break;
+			case "sleep":
+				command = new CommandSleep(msg);
+				execute(command);
+				break;
+			case "wait":
+				synchronized(lock) {
+					try {
+						lock.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				break;	
+			case "notify":
+				//command = new CommandNotify(msg);
+				System.out.println("notifying");
+				synchronized(lock) {
+					lock.notifyAll();
+				}
+				break;
 			}
 			
-			else if(msg[0].equals("getFib")) {
-				new Thread(new ConsumerThread(new FibThread(0))).start();
-			}
 			
-		}while (!"sair".equals(entrada.toString()));		
+		}while (!"sair".equals(entrada.toString()));
+	}
+	
+	public void execute(ICommand command) {
+		if(command.validate()) {
+			command.execute();
+		}
+		else
+			System.out.println("Invalid command");
+	}
+	
+	public void clientWait() throws InterruptedException {
+		lock.wait();
+	}
+	
+	public void clientNotify() {
+		lock.notifyAll();
 	}
 }
