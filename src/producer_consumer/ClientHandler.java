@@ -79,6 +79,9 @@ public class ClientHandler extends Thread{
 				if(validate(command))
 					commandNotify();
 				break;
+			default:
+				System.out.println("Invalid command");
+				break;
 			}
 			
 			
@@ -113,7 +116,7 @@ public class ClientHandler extends Thread{
 	
 	public void commandNotify() {
 		synchronized(lock) {
-			lock.notifyAll();
+			lock.notify();
 		}
 	}
 	
