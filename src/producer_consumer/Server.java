@@ -12,7 +12,7 @@ public class Server {
 		Socket conexao = null;
 				
 		try {
-			servidor = new ServerSocket(7000);
+			servidor = new ServerSocket(6999);
 			
 			
 			while(true) {

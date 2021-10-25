@@ -22,7 +22,7 @@ public class Client {
 		PrintStream saida = null;
 		
 		try {
-			cliente = new Socket("127.0.0.1", 7000);
+			cliente = new Socket("172.16.2.72", 6999);
 			
 			saida = new PrintStream(cliente.getOutputStream());
 			
