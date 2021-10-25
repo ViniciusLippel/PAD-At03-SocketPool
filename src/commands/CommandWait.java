@@ -10,13 +10,12 @@ public class CommandWait implements ICommand {
 	
 	@Override
 	public boolean validate() {
-		// TODO Auto-generated method stub
+		if(command.length == 1)
+			return true;
 		return false;
 	}
 	
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-		
 	}
 }

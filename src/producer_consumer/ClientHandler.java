@@ -4,22 +4,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Random;
 import commands.*;
 
 public class ClientHandler extends Thread{
 	
 	private Socket socket;
-	private final static Object lock = new Object();
+	public final static Object lock = new Object();
 	
 	public ClientHandler(Socket socket) {
 		this.socket = socket;
 	}
 	
+	public static Object getLock() {
+		return lock;
+	}
+
 	@Override
 	public void run() {
-		Random rand = new Random();
 		BufferedReader entrada = null;
+		System.out.println("New Client");
 		
 		try {
 			entrada = new BufferedReader (new InputStreamReader (this.socket.getInputStream()));
@@ -30,7 +33,6 @@ public class ClientHandler extends Thread{
 		
 		do {
 			String text = null;
-			System.out.println("do/while loop");
 			try {
 				text = entrada.readLine();
 			} catch (IOException e) {
@@ -51,28 +53,31 @@ public class ClientHandler extends Thread{
 			switch(msg[0]) {
 			case "new":
 				command = new CommandNew(msg);
-				execute(command);
+				validateExecute(command);
 				break;
 			case "sleep":
 				command = new CommandSleep(msg);
-				execute(command);
-				break;
-			case "wait":
-				synchronized(lock) {
+				if(validate(command)) {
 					try {
-						lock.wait();
+						commandSleep(Integer.parseInt(msg[1]));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
+				break;
+			case "wait":
+				command = new CommandWait(msg);
+				if(validate(command))
+					commandWait();
 				break;	
 			case "notify":
-				//command = new CommandNotify(msg);
-				System.out.println("notifying");
-				synchronized(lock) {
-					lock.notifyAll();
-				}
+				command = new CommandWait(msg);
+				if(validate(command))
+					commandNotify();
 				break;
 			}
 			
@@ -80,7 +85,7 @@ public class ClientHandler extends Thread{
 		}while (!"sair".equals(entrada.toString()));
 	}
 	
-	public void execute(ICommand command) {
+	public void validateExecute(ICommand command) {
 		if(command.validate()) {
 			command.execute();
 		}
@@ -88,11 +93,33 @@ public class ClientHandler extends Thread{
 			System.out.println("Invalid command");
 	}
 	
-	public void clientWait() throws InterruptedException {
-		lock.wait();
+	public boolean validate(ICommand command) {
+		if(command.validate())
+			return true;
+		System.out.println("Invalid Command");
+		return false;
 	}
 	
-	public void clientNotify() {
-		lock.notifyAll();
+	public void commandWait() {
+		synchronized(lock) {
+			try {
+				lock.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void commandNotify() {
+		synchronized(lock) {
+			lock.notifyAll();
+		}
+	}
+	
+	public void commandSleep(int mills) throws InterruptedException{
+		synchronized(lock) {
+			sleep(mills);
+		}
 	}
 }

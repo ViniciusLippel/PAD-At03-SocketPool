@@ -1,16 +1,12 @@
 package commands;
 
 import java.util.Arrays;
-import java.util.Random;
-
-import producer_consumer.ConsumerThread;
 import producer_consumer.FibThread;
 
 public class CommandNew implements ICommand {
 	
 	private String[] command;
 	private String[] actions = {"fib"};
-	private Random rand = new Random();
 	
 	public CommandNew(String[] command) {
 		this.command = command;
@@ -33,17 +29,13 @@ public class CommandNew implements ICommand {
 		}
 	}
 	
-	/*
-	else if(msg[0].equals("getFib")) {
-				new Thread(new ConsumerThread(new FibThread(0))).start();
-	}*/
 	
 	public boolean isNumeric(String str) {
 		if(str == null)
 			return false;
 		
 		try {
-			int n = Integer.parseInt(str);
+			Integer.parseInt(str);
 		} catch(NumberFormatException nfe) {
 			return false;
 		}

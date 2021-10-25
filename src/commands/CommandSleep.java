@@ -10,8 +10,10 @@ public class CommandSleep implements ICommand{
 	
 	@Override
 	public boolean validate() {
-		if(command.length == 3) {
-			//if(command[1])
+		if(command.length == 2) {
+			if(isNumeric(command[1])) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -22,4 +24,15 @@ public class CommandSleep implements ICommand{
 		
 	}
 	
+	public boolean isNumeric(String str) {
+		if(str == null)
+			return false;
+		
+		try {
+			Integer.parseInt(str);
+		} catch(NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
 }
